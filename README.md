@@ -1,37 +1,13 @@
-<h1>Top-level description</h1>
-This repo considers data from two sources:
-<ul>
-  <li><a href="https://science.ebird.org/en/use-ebird-data">EBird</a>, which compiles data regarding where, how often, which species of, 
-    and how many birds are seen at any given time and place</li>
-  <li>GHCNd, weather data from <a href="https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-daily">NOAA</a></li>
-</ul>
-Its goal is to use this information to train various models whose inputs consist of weather and bird data,
-and which attempt to predict how many birds of some species will be seen at some time and place in the future.
-In particular, we run a linear regression model, a time series model, and a recurrent neural network.
-<h2>Missing files</h2>
-Some files had to be removed from this repo due to the 100MB file size limit for our version of GitHub. Those coming directly from our above sources are as follows:
-<ul>
-  <li>Data/ghcnd_all.tar.gz</li>
-  <li>Data/amegfi/ebd_amegfi_smp_relFeb-2024.zip</li>
-</ul>
-Those which can be constructed with the files given, and are only in our local filesystems for efficiency, are as follows:
-<ul>
-  <li>Data/amegfi/2019_ebd_amegfi_Feb-2024.txt</li>
-  <li>Data/amegfi/2019_ebd_amegfi_Feb-2024_secondclean.csv</li>
-  <li>Data/amegfi/2023_ebd_amegfi_Feb-2024_aggregate.csv</li>
-  <li>AllSpecYear.csv</li>
-</ul>
-<h1>Workflow for this repo</h1>
-<ul>
-  <li>Weather data gathering happens in weather.ipynb</li>
-  <li>Bird data gathering:
-    <ul>
-      <li>FirstClean.ipynb</li>
-      <li>SecondClean.ipynb</li>
-    </ul>
-  </li>
-  <li>Integrating the data happens in Final Clean.ipynb</li>
-  <li>Building linear regression model happens in Basic Regression.ipynb</li>
-  <li>Building time series model happens in Basic Time Series from time_series.ipynb</li>
-  <li>Building RNN model happens in rnn.ipynb</li>
-</ul>
+### Top-level description
+This repo considers data from two sources: E-Bird data from "https://science.ebird.org/en/use-ebird-data" (which compiles data regarding where, how often, which species of, and how many birds are seen at any given time and place) and GHCNd weather data from NOAA "https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-daily." Its goal is to use linear regression models to predict how many birds of a specific species will be seen at some time and place in the future.
+
+### Description of the notebooks
+* BirdData.ipynb: We use E-Bird's American goldfinch observation data in a small section of the Midwest from 2018 to 2019. eBird is a semi-structured citizen science project, and each row of the data contains information about an instance of a bird observation and the process used for that instance. The information includes species observed, number of birds observed, the location of the observation, type of observation, and the amount of effort spent to make the observation. Importantly, it is possible for the observation count to be 0; this makes the data a more accurate description of the distribution of American goldfinch.
+* WeatherData.ipynb: We use GHCNd weather data from NOAA to obtain information about the weather for each of the bird observations. The data from each of the weather stations is aggregated based on the location of the stations; the small section of the Midwest that we consider is divided up into a grid of subsections based on longitude and latitude.
+* TrainTestSplit.ipynb: We merge the bird observation data and the weather data into a single Pandas DataFrame. We also split the data into a training set and a test set based on the observation date.
+* LinearRegression.ipynb: First, we apply linear regression on all the original variables to get a Cross-Validation MSE of 43.27. Then, we add Harmonic variables, perform feature selection using VIF's and Lasso regularization, and apply Lasso/Ridge regularization to improve the Cross-Validation MSE to 42.44.
+* LinearRegressionWithAddedFeatures.ipynb: The $R^2$ score on the training data seems to indicate a significant amount of outliers and an apparent lack the variables' predictive power. So, we will create new features from the data to reduce the cross-validation MSE. The features we include are a window average of the observation count at the specific location from the previous year, a rolling average of the observation count from the recent past, and transformations of the variables "DURATION MINUTES" and "TIME OBSERVATIONS STARTED". After including the new features, we perform feature selection using VIF's and Lasso regularization. As a result, the Cross-Validation MSE is reduced to 40.31.
+* TestError.ipynb: We perform linear regression on the variables selected in the notebook "LinearRegressionWithAddedFeatures.ipynb". This results in a Test MSE of 22.03.
+
+### Future Work
+While the added featured improved the Cross-Validation MSE and the $R^2$ score (to 40.31 and 0.049), there is still a lot of room for improvement. We can try adding more features in the data to better capture the signal for observation counts. We can also try using different models that explain the situation better. For instance, it would be interesting to see if we can fit more complex models (like Poisson Regression) to the data. At the moment, Poisson Regression performs very poorly with the features that we have.

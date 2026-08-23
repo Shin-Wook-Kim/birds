@@ -1,7 +1,7 @@
 ### Top-level description
 This repo considers data from two sources: E-Bird data from "https://science.ebird.org/en/use-ebird-data" (which compiles data regarding where, how often, which species of, and how many birds are seen at any given time and place) and GHCNd weather data from NOAA "https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-daily." Its goal is to use linear regression models to predict how many birds of a specific species will be seen at some time and place in the future.
 
-This project was originally a group project that Nicholas Christo, Michael Gintz, and I submitted for the Spring 2024 Data Science Bootcamp at the Erd\"os Institute.  
+This project was originally a group project that Nicholas Christo, Michael Gintz, and I submitted for the Spring 2024 Data Science Bootcamp at the Erdos Institute.  
 
 ### Description of the notebooks
 * BirdData.ipynb: We use E-Bird's American goldfinch observation data in a small section of the Midwest from 2018 to 2019. eBird is a semi-structured citizen science project, and each row of the data contains information about an instance of a bird observation and the process used for that instance. The information includes species observed, number of birds observed, the location of the observation, type of observation, and the amount of effort spent to make the observation. Importantly, it is possible for the observation count to be 0; this makes the data a more accurate description of the distribution of American goldfinch.
